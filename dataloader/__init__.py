@@ -1,1 +1,1 @@
-from kanedautils.dataloader import DataLoader
+from dataloader import DataLoader
