@@ -52,6 +52,10 @@ def extract_keyword(lines: list[str], keyword: str) -> str | None:
             break
     else:
         value = None
+
+    if value == '':
+        value = None
+
     return value
 
 
