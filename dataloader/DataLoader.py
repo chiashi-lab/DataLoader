@@ -110,6 +110,9 @@ class DataLoader:
                     value = [value.split()[0]] + list(map(float, value.split()[1:]))
                 else:
                     value = []
+            elif keyword == 'abs_path_raw':
+                if value is None:
+                    value = filename
 
             spectrum_dict[keyword] = value
 
