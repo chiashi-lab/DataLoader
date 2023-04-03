@@ -41,7 +41,6 @@ def extract_keyword(lines: list[str], keyword: str) -> str | None:
     def process(s: str) -> list[str]:
         s = s.strip('# ')
         s = s.strip('\n')
-        print(s)
         return s.split(': ')
 
     for line in lines:
