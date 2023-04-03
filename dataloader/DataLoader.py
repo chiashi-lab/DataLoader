@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 import numpy as np
 import pandas as pd
+import time
 
 
 @dataclass
@@ -50,6 +51,10 @@ def extract_keyword(lines: list[str], keyword: str) -> str | None:
             break
     else:
         value = None
+
+    if value == '':
+        value = None
+
     return value
 
 
@@ -108,6 +113,9 @@ class DataLoader:
                     value = [value.split()[0]] + list(map(float, value.split()[1:]))
                 else:
                     value = []
+            elif keyword == 'abs_path_raw':
+                if value is None:
+                    value = filename
 
             spectrum_dict[keyword] = value
 
@@ -153,11 +161,12 @@ class DataLoader:
         for spec in self.spec_dict.values():
             spec.highlight = False
 
-    def save(self, filename: str) -> None:
+    def save(self, filename: str, filename_as: str = None) -> None:
         spec = self.spec_dict[filename]
         data = np.vstack((spec.xdata.T, spec.ydata.T)).T
-        filename_pgraph = '.'.join(filename.split('.')[:-1]) + '_pgraph.' + filename.split('.')[-1]
-        with open(filename_pgraph, 'w') as f:
+        if filename_as is None:
+            filename_as = f'{".".join(filename.split(".")[:-1])}_{time.time()}.{filename.split(".")[-1]}'
+        with open(filename_as, 'w') as f:
             f.write(f'# abs_path_raw: {spec.abs_path_raw}\n')
             f.write(f'# abs_path_ref: {spec.abs_path_ref}\n')
             f.write(f'# calibration: {spec.calibration}\n')
