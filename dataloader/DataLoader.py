@@ -59,7 +59,7 @@ def extract_keyword(lines: list[str], keyword: str) -> str | None:
 
 
 def find_skip(lines: list[str]) -> int:
-    numeric_str_list = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', ',', '\t', '\n']
+    numeric_str_list = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', ',', '-', '\t', '\n']
     for i, line in enumerate(lines):
         for s in line:
             if s not in numeric_str_list:  # if there is a non-numeric character
