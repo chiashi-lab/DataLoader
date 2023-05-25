@@ -112,12 +112,12 @@ class DataLoader:
                     value = lines[:skip_rows]
             elif keyword == 'fitting_range':
                 if value is not None:
-                    value = list(map(float, value.split()))
+                    value = list(map(float, value.split(', ')))
                 else:
                     value = []
             elif keyword == 'fitting_values':
                 if value is not None:
-                    value = list(map(float, value.split()))
+                    value = list(map(float, value.split(', ')))
                 else:
                     value = []
             elif keyword == 'abs_path_raw':
