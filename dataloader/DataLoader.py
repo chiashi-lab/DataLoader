@@ -15,7 +15,7 @@ class Spectrum:
     description: list
     fitting: list[float]
     fitting_function: str
-    fitting_range: list[flost]
+    fitting_range: list[float]
     fitting_values: list[float]
     color: str = 'black'
     linestyle: str = 'solid'
