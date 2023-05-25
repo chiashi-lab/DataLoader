@@ -13,7 +13,6 @@ class Spectrum:
     abs_path_ref: str
     calibration: list
     description: list
-    fitting: list[float]
     fitting_function: str
     fitting_range: list[float]
     fitting_values: list[float]
