@@ -14,6 +14,9 @@ class Spectrum:
     calibration: list
     description: list
     fitting: list[float]
+    fitting_function: str
+    fitting_range: list[flost]
+    fitting_values: list[float]
     color: str = 'black'
     linestyle: str = 'solid'
     y_shift: float = 0
@@ -102,15 +105,20 @@ class DataLoader:
             raise ValueError('No numeric data found. Check the input file again.')
 
         spectrum_dict = {}
-        for keyword in ['abs_path_raw', 'abs_path_ref', 'calibration', 'description', 'fitting', 'device']:
+        for keyword in ['abs_path_raw', 'abs_path_ref', 'calibration', 'description', 'fitting_function', 'fitting_range', 'fitting_values', 'device']:
             value = extract_keyword(lines, keyword)
 
             if keyword == 'description':
                 if value is None:  # if it is the raw data
                     value = lines[:skip_rows]
-            elif keyword == 'fitting':
+            elif keyword == 'fitting_range':
                 if value is not None:
-                    value = [value.split()[0]] + list(map(float, value.split()[1:]))
+                    value = list(map(float, value.split()))
+                else:
+                    value = []
+            elif keyword == 'fitting_values':
+                if value is not None:
+                    value = list(map(float, value.split()))
                 else:
                     value = []
             elif keyword == 'abs_path_raw':
@@ -172,8 +180,9 @@ class DataLoader:
             f.write(f'# calibration: {spec.calibration}\n')
             f.write(f'# device: {spec.device}\n')
             f.write(f'# description: {spec.description}\n')
-            fitting_str = spec.fitting.__str__().replace(',', '').replace("'", '').replace('\n', '').replace('[', '').replace(']', '')
-            f.write(f'# fitting: {fitting_str}\n\n')
+            f.write(f'# fitting_function: {spec.fitting_function}\n')
+            f.write(f'# fitting_range: {spec.fitting_range.__str__().replace("[", "").replace("]", "")}\n')
+            f.write(f'# fitting_values: {spec.fitting_values.__str__().replace("[", "").replace("]", "")}\n\n')
 
             for x, y in data:
                 f.write(f'{x},{y}\n')
