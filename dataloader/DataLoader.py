@@ -142,12 +142,12 @@ class DataLoader:
 
         return True
 
-    def load_files(self, filenames: list[str]) -> bool:
-        ok_list = []
+    def load_files(self, filenames: list[str]) -> dict:
+        ok_dict = {}
         for filename in filenames:
             ok = self.load_file(filename)
-            ok_list.append(ok)
-        return all(ok_list)
+            ok_dict[filename] = ok
+        return ok_dict
 
     def concat_spec(self) -> pd.DataFrame:
         xdata_list = []
