@@ -91,13 +91,16 @@ class DataLoader:
         if filenames is not None:
             self.load_files(filenames)
 
-    def load_file(self, filename: str) -> None:
+    def load_file(self, filename: str) -> bool:
         if filename in self.spec_dict.keys():
-            print(f'このファイルは既に読み込まれています．：{filename}')
-            return
-
-        with open(filename, 'r') as f:
-            lines = f.readlines()
+            print(f'このファイルは既に読み込まれています：{filename}')
+            return False
+        try:
+            with open(filename, 'r') as f:
+                lines = f.readlines()
+        except UnicodeDecodeError:
+            print('非対応のファイル形式です')
+            return False
 
         skip_rows = find_skip(lines)
         if skip_rows == -1:
@@ -137,9 +140,14 @@ class DataLoader:
 
         self.spec_dict[filename] = Spectrum(**spectrum_dict)
 
-    def load_files(self, filenames: list[str]) -> None:
+        return True
+
+    def load_files(self, filenames: list[str]) -> bool:
+        ok_list = []
         for filename in filenames:
-            self.load_file(filename)
+            ok = self.load_file(filename)
+            ok_list.append(ok)
+        return all(ok_list)
 
     def concat_spec(self) -> pd.DataFrame:
         xdata_list = []
