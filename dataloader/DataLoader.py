@@ -77,7 +77,7 @@ def find_sep(filename: str, skip_rows: int) -> str:
     sep_list = ['\t', ',', '   ']
     num_cols_list = []
     for sep in sep_list:
-        df = pd.read_csv(filename, sep=sep, skiprows=skip_rows, header=None)
+        df = pd.read_csv(filename, engine='python', sep=sep, skiprows=skip_rows, header=None)
         num_cols_list.append(df.shape[1])
     return sep_list[num_cols_list.index(max(num_cols_list))]
 
@@ -130,7 +130,7 @@ class DataLoader:
             spectrum_dict[keyword] = value
 
         sep = find_sep(filename, skip_rows)
-        df = pd.read_csv(filename, sep=sep, skiprows=skip_rows, header=None)
+        df = pd.read_csv(filename, engine='python', sep=sep, skiprows=skip_rows, header=None)
         if df.shape[1] == 1:
             spectrum_dict['xdata'] = np.arange(1, df.shape[0] + 1)
             spectrum_dict['ydata'] = df.iloc[:, 0].values
