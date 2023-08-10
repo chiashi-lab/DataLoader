@@ -139,7 +139,7 @@ class DataLoader:
             print('Only one column is found. The first column is used as ydata.')
         elif df.shape[1] == 2:
             spectrum_dict['xdata'] = df.iloc[:, 0].values
-            spectrum_dict['ydata'] = df.iloc[:, 1:].values
+            spectrum_dict['ydata'] = df.iloc[:, 1].values
             self.spec_dict[filename] = Spectrum(**spectrum_dict)
         else:
             spectrum_dict['xdata'] = df.iloc[:, 0].values
