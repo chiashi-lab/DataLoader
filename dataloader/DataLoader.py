@@ -112,7 +112,10 @@ class DataLoader:
             value = extract_keyword(lines, keyword)
 
             if keyword == 'abs_path_raw':
-                if value is None:  # if it is the raw data
+                if value is None:
+                    value = filename
+            elif keyword == 'description':
+                if spectrum_dict.get('abs_path_raw') == filename:  # if itself is the raw data
                     value = lines[:skiprows]
             elif keyword == 'fitting_range':
                 if value is not None:
@@ -124,9 +127,6 @@ class DataLoader:
                     value = list(map(float, value.split(', ')))
                 else:
                     value = []
-            elif keyword == 'abs_path_raw':
-                if value is None:
-                    value = filename
 
             spectrum_dict[keyword] = value
 
@@ -137,7 +137,7 @@ class DataLoader:
             spectrum_dict['ydata'] = df.iloc[:, 0].values
         else:
             spectrum_dict['xdata'] = df.iloc[:, 0].values
-            spectrum_dict['ydata'] = df.iloc[:, 1].values
+            spectrum_dict['ydata'] = df.iloc[:, 1:].values
 
         self.spec_dict[filename] = Spectrum(**spectrum_dict)
 
@@ -184,13 +184,13 @@ class DataLoader:
             filename_as = f'{".".join(filename.split(".")[:-1])}_{time.time()}.{filename.split(".")[-1]}'
         with open(filename_as, 'w') as f:
             f.write(f'# abs_path_raw: {spec.abs_path_raw}\n')
-            f.write(f'# abs_path_ref: {spec.abs_path_ref}\n')
-            f.write(f'# calibration: {spec.calibration}\n')
+            f.write(f'# abs_path_ref: {spec.abs_path_ref if spec.abs_path_ref else ""}\n')
+            f.write(f'# calibration: {spec.calibration if spec.calibration else ""}\n')
             f.write(f'# device: {spec.device}\n')
-            f.write(f'# description: {spec.description}\n')
-            f.write(f'# fitting_function: {spec.fitting_function}\n')
-            f.write(f'# fitting_range: {",".join(spec.fitting_range)}\n')
-            f.write(f'# fitting_values: {", ".join(spec.fitting_values)}\n\n')
+            f.write(f'# description: {spec.description if spec.description else ""}\n')
+            f.write(f'# fitting_function: {spec.fitting_function if spec.fitting_function else ""}\n')
+            f.write(f'# fitting_range: {",".join(spec.fitting_range) if spec.fitting_range else ""}\n')
+            f.write(f'# fitting_values: {", ".join(spec.fitting_values) if spec.fitting_values else ""}\n\n')
 
             for x, y in data:
                 f.write(f'{x},{y}\n')
