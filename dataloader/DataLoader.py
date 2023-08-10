@@ -135,9 +135,12 @@ class DataLoader:
         if df.shape[1] == 1:
             spectrum_dict['xdata'] = np.arange(1, df.shape[0] + 1)
             spectrum_dict['ydata'] = df.iloc[:, 0].values
-        else:
+        elif df.shape[1] == 2:
             spectrum_dict['xdata'] = df.iloc[:, 0].values
             spectrum_dict['ydata'] = df.iloc[:, 1:].values
+        else:
+            spectrum_dict['xdata'] = df.iloc[:, 0].values
+            spectrum_dict['ydata'] = df.iloc[:, 1:].values.T
 
         self.spec_dict[filename] = Spectrum(**spectrum_dict)
 
