@@ -147,7 +147,10 @@ class DataLoader:
             for i, ydata in enumerate(spectrum_dict['ydata']):
                 tmp_dict = spectrum_dict.copy()
                 tmp_dict['ydata'] = ydata
-                self.spec_dict[f'{filename}({i})'] = Spectrum(**tmp_dict)
+                if i == 0:
+                    self.spec_dict[filename] = Spectrum(**tmp_dict)
+                else:
+                    self.spec_dict[f'{filename}({i})'] = Spectrum(**tmp_dict)
 
         return True
 
