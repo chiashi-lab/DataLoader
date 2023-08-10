@@ -135,14 +135,19 @@ class DataLoader:
         if df.shape[1] == 1:
             spectrum_dict['xdata'] = np.arange(1, df.shape[0] + 1)
             spectrum_dict['ydata'] = df.iloc[:, 0].values
+            self.spec_dict[filename] = Spectrum(**spectrum_dict)
+            print('Only one column is found. The first column is used as ydata.')
         elif df.shape[1] == 2:
             spectrum_dict['xdata'] = df.iloc[:, 0].values
             spectrum_dict['ydata'] = df.iloc[:, 1:].values
+            self.spec_dict[filename] = Spectrum(**spectrum_dict)
         else:
             spectrum_dict['xdata'] = df.iloc[:, 0].values
             spectrum_dict['ydata'] = df.iloc[:, 1:].values.T
-
-        self.spec_dict[filename] = Spectrum(**spectrum_dict)
+            for i, ydata in enumerate(spectrum_dict['ydata']):
+                tmp_dict = spectrum_dict.copy()
+                tmp_dict['ydata'] = ydata
+                self.spec_dict[f'{filename}({i})'] = Spectrum(**tmp_dict)
 
         return True
 
