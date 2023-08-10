@@ -1,0 +1,15 @@
+text
+text
+text
+text
+# abs_path_raw: raw.txt
+# abs_path_ref: ref.txt
+# calibration: sulfur 1 2 3
+# description:
+# fitting_function: Lorentzian
+# fitting_range: 0.0, 0.0
+# fitting_values: 0.0, 0.0, 0.0, 0.0
+# device:
+100,100
+100,100
+200,-100

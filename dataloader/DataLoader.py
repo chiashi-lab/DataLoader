@@ -1,3 +1,4 @@
+import re
 from dataclasses import dataclass
 import numpy as np
 import pandas as pd
@@ -41,18 +42,15 @@ class Spectrum:
 
 
 def extract_keyword(lines: list[str], keyword: str) -> str | None:
-    def process(s: str) -> list[str]:
-        s = s.strip('# ')
-        s = s.strip('\n')
-        return s.split(': ')
+    pattern = re.compile(f'^# {keyword}: (.*)$')
+    matched = [pattern.match(line).group(1) for line in lines if pattern.match(line)]
 
-    for line in lines:
-        if keyword in line:
-            name, *value = process(line)
-            value = ': '.join(value)
-            break
-    else:
+    if len(matched) == 0:
         value = None
+    elif len(matched) == 1:
+        value = matched[0]
+    else:
+        raise ValueError(f'Keyword {keyword} is duplicated.')
 
     if value == '':
         value = None
@@ -60,26 +58,28 @@ def extract_keyword(lines: list[str], keyword: str) -> str | None:
     return value
 
 
+NUMERIC_PATTERN = r'[+-]?\d+(?:\.\d+)?'
+SEP_PATTERN = r'[ ,\t]+'
+IS_NUMERIC = re.compile(NUMERIC_PATTERN)
+IS_NUMERIC_SEP_NUMERIC = re.compile(fr'^({NUMERIC_PATTERN})({SEP_PATTERN})({NUMERIC_PATTERN})') # for finding the separator
+IS_NUMERIC_ROW = re.compile(f'^({NUMERIC_PATTERN}{SEP_PATTERN})*{NUMERIC_PATTERN}$')
+
+
 def find_skip(lines: list[str]) -> int:
-    numeric_str_list = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', ',', '-', '\t', '\n']
     for i, line in enumerate(lines):
-        for s in line:
-            if s not in numeric_str_list:  # if there is a non-numeric character
-                break
-        else:  # if all the character is numeric
+        if IS_NUMERIC_ROW.match(line):
             break
-    else:  # if all the lines are non-numeric
+    else:  # if all lines are non-numeric
         i = -1
     return i
 
 
-def find_sep(filename: str, skip_rows: int) -> str:
-    sep_list = ['\t', ',', '   ']
-    num_cols_list = []
-    for sep in sep_list:
-        df = pd.read_csv(filename, engine='python', encoding='cp932', sep=sep, skiprows=skip_rows, header=None)
-        num_cols_list.append(df.shape[1])
-    return sep_list[num_cols_list.index(max(num_cols_list))]
+def find_sep(line):
+    matched = IS_NUMERIC_SEP_NUMERIC.match(line)
+    if matched is None:
+        return ''
+    else:
+        return matched.group(2)
 
 
 class DataLoader:
@@ -102,17 +102,18 @@ class DataLoader:
             print('非対応のファイル形式です')
             return False
 
-        skip_rows = find_skip(lines)
-        if skip_rows == -1:
+        skiprows = find_skip(lines)
+        if skiprows == -1:
             raise ValueError('No numeric data found. Check the input file again.')
+        skipfooter = find_skip(lines[::-1])
 
         spectrum_dict = {}
         for keyword in ['abs_path_raw', 'abs_path_ref', 'calibration', 'description', 'fitting_function', 'fitting_range', 'fitting_values', 'device']:
             value = extract_keyword(lines, keyword)
 
-            if keyword == 'description':
+            if keyword == 'abs_path_raw':
                 if value is None:  # if it is the raw data
-                    value = lines[:skip_rows]
+                    value = lines[:skiprows]
             elif keyword == 'fitting_range':
                 if value is not None:
                     value = list(map(float, value.split(', ')))
@@ -129,8 +130,8 @@ class DataLoader:
 
             spectrum_dict[keyword] = value
 
-        sep = find_sep(filename, skip_rows)
-        df = pd.read_csv(filename, engine='python', encoding='cp932', sep=sep, skiprows=skip_rows, header=None)
+        sep = find_sep(lines[skiprows])
+        df = pd.read_csv(filename, engine='python', encoding='cp932', sep=sep, skiprows=skiprows, skipfooter=skipfooter, header=None)
         if df.shape[1] == 1:
             spectrum_dict['xdata'] = np.arange(1, df.shape[0] + 1)
             spectrum_dict['ydata'] = df.iloc[:, 0].values
@@ -188,8 +189,65 @@ class DataLoader:
             f.write(f'# device: {spec.device}\n')
             f.write(f'# description: {spec.description}\n')
             f.write(f'# fitting_function: {spec.fitting_function}\n')
-            f.write(f'# fitting_range: {spec.fitting_range.__str__().replace("[", "").replace("]", "")}\n')
-            f.write(f'# fitting_values: {spec.fitting_values.__str__().replace("[", "").replace("]", "")}\n\n')
+            f.write(f'# fitting_range: {",".join(spec.fitting_range)}\n')
+            f.write(f'# fitting_values: {", ".join(spec.fitting_values)}\n\n')
 
             for x, y in data:
                 f.write(f'{x},{y}\n')
+
+
+def test():
+    # IS_NUMERIC.match
+    def is_numeric(s: str) -> bool:
+        return IS_NUMERIC_ROW.match(s) is not None
+    assert is_numeric('1')
+    assert is_numeric('1, 2\n')
+    assert is_numeric('1, 2, 3\n')
+    assert is_numeric('1, 2, 3, 4, 5, 6')
+    assert is_numeric('-111,+100')
+    assert not is_numeric('a')
+    assert not is_numeric('1 ')
+    assert not is_numeric('1, 2, 3,')
+    assert not is_numeric('1, 2e')
+    assert not is_numeric('-111,--100')
+    print('is_numeric: OK')
+
+    # find_skip
+    lines = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']
+    assert find_skip(lines) == -1
+    lines = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', '1, 2, 3']
+    assert find_skip(lines) == 9
+    assert find_skip(lines[::-1]) == 0
+    lines = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i\n', '1, 2, 3', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's']
+    assert find_skip(lines) == 9
+    assert find_skip(lines[::-1]) == 10
+    print('find_skip: OK')
+
+    # find_sep
+    assert find_sep('1') == ''
+    assert find_sep('1,1') == ','
+    assert find_sep('1,1,1') == ','
+    assert find_sep('1, 1') == ', '
+    assert find_sep('-1, -1') == ', '
+    assert find_sep('1  -1') == '  '
+    assert find_sep('1\t-1') == '\t'
+    assert find_sep('1\t-1\n') == '\t'
+    print('find_sep: OK')
+
+    # load_file
+    loader = DataLoader()
+    loader.load_file('test.txt')
+    assert loader.spec_dict['test.txt'].abs_path_raw == 'raw.txt'
+    assert loader.spec_dict['test.txt'].abs_path_ref == 'ref.txt'
+    assert loader.spec_dict['test.txt'].calibration == 'sulfur 1 2 3'
+    assert loader.spec_dict['test.txt'].device == 'Unknown'
+    assert loader.spec_dict['test.txt'].description is None
+    assert loader.spec_dict['test.txt'].xdata[0] == 100
+    assert loader.spec_dict['test.txt'].xdata[-1] == 200
+    assert loader.spec_dict['test.txt'].ydata[0] == 100
+    assert loader.spec_dict['test.txt'].ydata[-1] == -100
+    print('load_file: OK')
+
+
+if __name__ == '__main__':
+    test()
