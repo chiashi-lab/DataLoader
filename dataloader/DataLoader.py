@@ -200,8 +200,8 @@ class DataLoader:
             f.write(f'# device: {spec.device}\n')
             f.write(f'# description: {spec.description if spec.description else ""}\n')
             f.write(f'# fitting_function: {spec.fitting_function if spec.fitting_function else ""}\n')
-            f.write(f'# fitting_range: {",".join(spec.fitting_range) if spec.fitting_range else ""}\n')
-            f.write(f'# fitting_values: {", ".join(spec.fitting_values) if spec.fitting_values else ""}\n\n')
+            f.write(f'# fitting_range: {",".join(map(str, spec.fitting_range)) if spec.fitting_range else ""}\n')
+            f.write(f'# fitting_values: {", ".join(map(str, spec.fitting_values)) if spec.fitting_values else ""}\n\n')
 
             for x, y in data:
                 f.write(f'{x},{y}\n')
@@ -258,6 +258,8 @@ def test():
     assert loader.spec_dict['test.txt'].ydata[0] == 100
     assert loader.spec_dict['test.txt'].ydata[-1] == -100
     print('load_file: OK')
+
+    loader.save('test.txt', 'test_save.txt')
 
 
 if __name__ == '__main__':
