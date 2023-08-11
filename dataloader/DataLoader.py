@@ -1,3 +1,4 @@
+import os.path
 import re
 from dataclasses import dataclass
 import numpy as np
@@ -188,11 +189,11 @@ class DataLoader:
         for spec in self.spec_dict.values():
             spec.highlight = False
 
-    def save(self, filename: str, filename_as: str = None) -> None:
+    def save(self, filename: str, filename_as: str = None) -> str:
         spec = self.spec_dict[filename]
         data = np.vstack((spec.xdata.T, spec.ydata.T)).T
         if filename_as is None:
-            filename_as = f'{".".join(filename.split(".")[:-1])}_{time.time()}.{filename.split(".")[-1]}'
+            filename_as = f'{os.path.splitext(filename)[0]}_{time.time()}{os.path.splitext(filename)[1]}'
         with open(filename_as, 'w') as f:
             f.write(f'# abs_path_raw: {spec.abs_path_raw}\n')
             f.write(f'# abs_path_ref: {spec.abs_path_ref if spec.abs_path_ref else ""}\n')
@@ -205,6 +206,8 @@ class DataLoader:
 
             for x, y in data:
                 f.write(f'{x},{y}\n')
+
+        return filename_as
 
 
 def test():
