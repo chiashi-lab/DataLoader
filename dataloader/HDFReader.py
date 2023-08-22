@@ -52,7 +52,7 @@ class RamanHDFReader(HDFReader):
         }
 
 
-class RamanHDFWriter(HDFReader):
+class RamanHDFWriter(HDFWriter):
     def __init__(self, path):
         super().__init__(path)
 
