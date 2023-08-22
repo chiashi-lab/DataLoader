@@ -16,8 +16,8 @@ class Spectrum:
     calibration: list
     description: list
     fitting_function: str
-    fitting_range: list[float]
-    fitting_values: list[float]
+    fitting_range: list
+    fitting_values: list
     color: str = 'black'
     linestyle: str = 'solid'
     y_shift: float = 0
@@ -42,7 +42,7 @@ class Spectrum:
         self.highlight = False
 
 
-def extract_keyword(lines: list[str], keyword: str) -> str | None:
+def extract_keyword(lines: list, keyword: str) -> str | None:
     pattern = re.compile(f'^# {keyword}: (.*)$')
     matched = [pattern.match(line).group(1) for line in lines if pattern.match(line)]
 
@@ -84,7 +84,7 @@ def find_sep(line):
 
 
 class DataLoader:
-    def __init__(self, filename: str = None, filenames: list[str] = None):
+    def __init__(self, filename: str = None, filenames: list = None):
         self.spec_dict: dict[str: Spectrum] = {}
 
         if filename is not None:
@@ -155,7 +155,7 @@ class DataLoader:
 
         return True
 
-    def load_files(self, filenames: list[str]) -> dict:
+    def load_files(self, filenames: list) -> dict:
         ok_dict = {}
         for filename in filenames:
             ok = self.load_file(filename)
@@ -181,7 +181,7 @@ class DataLoader:
     def delete_file(self, filename: str) -> None:
         del self.spec_dict[filename]
 
-    def delete_files(self, filenames: list[str]) -> None:
+    def delete_files(self, filenames: list) -> None:
         for filename in filenames:
             self.delete_file(filename)
 
