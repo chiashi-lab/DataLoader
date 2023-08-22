@@ -42,7 +42,7 @@ class Spectrum:
         self.highlight = False
 
 
-def extract_keyword(lines: list, keyword: str) -> str | None:
+def extract_keyword(lines: list, keyword: str) -> str:
     pattern = re.compile(f'^# {keyword}: (.*)$')
     matched = [pattern.match(line).group(1) for line in lines if pattern.match(line)]
 
@@ -66,7 +66,7 @@ IS_NUMERIC_SEP_NUMERIC = re.compile(fr'^({NUMERIC_PATTERN})({SEP_PATTERN})({NUME
 IS_NUMERIC_ROW = re.compile(f'^({NUMERIC_PATTERN}{SEP_PATTERN})*{NUMERIC_PATTERN}$')
 
 
-def find_skip(lines: list[str]) -> int:
+def find_skip(lines: list) -> int:
     for i, line in enumerate(lines):
         if IS_NUMERIC_ROW.match(line):
             break
