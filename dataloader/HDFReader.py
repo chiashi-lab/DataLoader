@@ -36,19 +36,19 @@ class RamanHDFReader(HDFReader):
         super().__init__(path)
         self.xdata = self.file['xdata'][:]
         self.spactra = self.file['spectra'][:]
-        self.x_start = self.file['x_start'][()]
-        self.y_start = self.file['y_start'][()]
-        self.x_pad = self.file['x_pad'][()]
-        self.y_pad = self.file['y_pad'][()]
-        self.x_span = self.file['x_span'][()]
-        self.y_span = self.file['y_span'][()]
+
+        self.time = self.file.attrs['time'][()]
+        self.integration = self.file.attrs['integration'][()]
+        self.accumulation = self.file.attrs['accumulation'][()]
+        self.pixel_size = self.file.attrs['pixel_size'][()]
+        self.shape = self.file.attrs['shape'][()]
         self.map_info = {
-            'x_start': self.file['x_start'][()],
-            'y_start': self.file['y_start'][()],
-            'x_pad': self.file['x_pad'][()],
-            'y_pad': self.file['y_pad'][()],
-            'x_span': self.file['x_span'][()],
-            'y_span': self.file['y_span'][()]
+            'x_start': self.file.attrs['x_start'][()],
+            'y_start': self.file.attrs['y_start'][()],
+            'x_pad': self.file.attrs['x_pad'][()],
+            'y_pad': self.file.attrs['y_pad'][()],
+            'x_span': self.file.attrs['x_span'][()],
+            'y_span': self.file.attrs['y_span'][()]
         }
 
 
