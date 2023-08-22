@@ -35,7 +35,7 @@ class RamanHDFReader(HDFReader):
     def __init__(self, path):
         super().__init__(path)
         self.xdata = self.file['xdata'][:]
-        self.spactra = self.file['spectra'][:]
+        self.spectra = self.file['spectra'][:]
 
         self.time = self.file.attrs['time']
         self.integration = self.file.attrs['integration']
