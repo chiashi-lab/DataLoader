@@ -6,7 +6,7 @@ import time
 
 
 class Spectrum:
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.xdata: np.ndarray
         self.ydata: np.ndarray
         self.device: str
