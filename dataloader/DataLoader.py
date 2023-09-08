@@ -3,25 +3,26 @@ import re
 import numpy as np
 import pandas as pd
 import time
+from dataclasses import dataclass
 
 
+@dataclass
 class Spectrum:
-    def __init__(self, *args, **kwargs):
-        self.xdata: np.ndarray
-        self.ydata: np.ndarray
-        self.device: str
-        self.abs_path_raw: str
-        self.abs_path_ref: str
-        self.calibration: list
-        self.description: list
-        self.fitting_function: str
-        self.fitting_range: list
-        self.fitting_values: list
-        self.color: str = 'black'
-        self.linestyle: str = 'solid'
-        self.y_shift: float = 0
-        self.y_times: float = 1
-        self.highlight: bool = False
+    xdata: np.ndarray
+    ydata: np.ndarray
+    device: str
+    abs_path_raw: str
+    abs_path_ref: str
+    calibration: list
+    description: list
+    fitting_function: str
+    fitting_range: list
+    fitting_values: list
+    color: str = 'black'
+    linestyle: str = 'solid'
+    y_shift: float = 0
+    y_times: float = 1
+    highlight: bool = False
 
     def __post_init__(self):
         if self.xdata.shape[0] == 1015:
