@@ -6,17 +6,17 @@ import time
 
 
 class Spectrum:
-    def __init__(self):
-        self.xdata: np.ndarray
-        self.ydata: np.ndarray
-        self.device: str
-        self.abs_path_raw: str
-        self.abs_path_ref: str
-        self.calibration: list
-        self.description: list
-        self.fitting_function: str
-        self.fitting_range: list
-        self.fitting_values: list
+    def __init__(self, xdata: np.ndarray, ydata: np.ndarray, device: str = None, abs_path_raw: str = None, abs_path_ref: str = None, calibration: list = None, description: list = None, fitting_function: str = None, fitting_range: list = None, fitting_values: list = None):
+        self.xdata: np.ndarray = xdata
+        self.ydata: np.ndarray = ydata
+        self.device: str = device
+        self.abs_path_raw: str = abs_path_raw
+        self.abs_path_ref: str = abs_path_ref
+        self.calibration: list = calibration
+        self.description: list = description
+        self.fitting_function: str = fitting_function
+        self.fitting_range: list = fitting_range
+        self.fitting_values: list = fitting_values
         self.color: str = 'black'
         self.linestyle: str = 'solid'
         self.y_shift: float = 0
