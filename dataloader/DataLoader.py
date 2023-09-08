@@ -23,7 +23,6 @@ class Spectrum:
         self.y_times: float = 1
         self.highlight: bool = False
 
-    def __post_init__(self):
         if self.xdata.shape[0] == 1015:
             self.device = 'Renishaw'
         elif self.xdata.shape[0] == 1024:
