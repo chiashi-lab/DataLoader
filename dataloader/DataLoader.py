@@ -202,7 +202,7 @@ class DataLoader:
             f.write(f'# description: {spec.description if spec.description else ""}\n')
             f.write(f'# fitting_function: {spec.fitting_function if spec.fitting_function else ""}\n')
             f.write(f'# fitting_range: {", ".join(map(str, spec.fitting_range)) if spec.fitting_range else ""}\n')
-            f.write(f'# fitting_values: {", ".join(map(str, spec.fitting_values)) if spec.fitting_values else ""}\n\n')
+            f.write(f'# fitting_values: {", ".join(map(str, spec.fitting_values)) if spec.fitting_values else ""}\n')
 
             for x, y in data:
                 f.write(f'{x},{y}\n')
